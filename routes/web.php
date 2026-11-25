@@ -46,7 +46,7 @@ use Illuminate\Support\Facades\Route;
 Route::view('/', 'welcome')->name('home');
 
 // Alias for standard Laravel Fortify dashboard redirect
-Route::get('dashboard', Dashboard::class)->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('dashboard', Dashboard::class)->middleware(['auth', 'verified', 'admin'])->name('dashboard');
 
 // Meta WhatsApp Cloud API Webhook Routes (CSRF exempt + Rate limited)
 Route::prefix('webhook/whatsapp')->middleware('throttle:120,1')->group(function () {
@@ -61,7 +61,7 @@ Route::prefix('webhook/sarvam/calls')->middleware('throttle:120,1')->group(funct
 });
 
 // Admin Livewire SaaS Routes
-Route::middleware(['auth', 'verified'])->prefix('livewire/admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'verified', 'admin'])->prefix('livewire/admin')->name('admin.')->group(function () {
     // 1. Dashboard
     Route::get('dashboard', Dashboard::class)->name('dashboard');
 

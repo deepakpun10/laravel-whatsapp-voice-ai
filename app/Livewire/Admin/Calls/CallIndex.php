@@ -256,6 +256,14 @@ class CallIndex extends Component
 
     public function render()
     {
+        // Auto-resolve stale initiated/ringing calls older than 10 minutes
+        Call::whereIn('status', ['initiated', 'ringing'])
+            ->where('created_at', '<', now()->subMinutes(10))
+            ->update([
+                'status' => 'missed',
+                'outcome' => 'no_answer',
+            ]);
+
         $totalCalls = Call::count();
         $completedCalls = Call::where('status', 'completed')->count();
         $interestedCalls = Call::whereIn('outcome', ['interested', 'meeting_scheduled', 'callback_requested'])->count();

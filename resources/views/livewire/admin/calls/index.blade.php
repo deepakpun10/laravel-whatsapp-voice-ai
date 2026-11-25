@@ -90,7 +90,7 @@
         </div>
 
         <!-- Filter Controls Row -->
-        <div style="display:grid; grid-template-columns:2fr 1.2fr 1.2fr 1fr 1fr auto; gap:10px; align-items:center;">
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:10px; align-items:center;">
             <!-- Search -->
             <div style="position:relative;">
                 <input
@@ -198,9 +198,9 @@
                     $st = $outcomeColors[$outcome] ?? ['bg' => '#f8fafc', 'text' => '#475569', 'border' => '#e2e8f0'];
                 @endphp
 
-                <div style="background:white; border:1px solid {{ $isExpanded ? '#3b82f6' : '#e2e8f0' }}; border-radius:14px; box-shadow:0 4px 16px rgba(0,0,0,.03); overflow:hidden; transition:border-color 0.15s;">
+                <div wire:key="call-group-{{ md5($record['phone_number']) }}" style="background:white; border:1px solid {{ $isExpanded ? '#3b82f6' : '#e2e8f0' }}; border-radius:14px; box-shadow:0 4px 16px rgba(0,0,0,.03); overflow:hidden; transition:border-color 0.15s;">
                     <!-- Card Main Summary Header -->
-                    <div style="padding:16px 20px; display:grid; grid-template-columns:auto 2fr 1.2fr 1fr 1fr 1.2fr auto; gap:16px; align-items:center;">
+                    <div style="padding:16px 20px; display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:14px; align-items:center;">
                         <!-- Select Checkbox -->
                         <div>
                             <input

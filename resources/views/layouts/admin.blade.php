@@ -52,8 +52,21 @@
             .mobile-overlay.show { display: block; position: fixed; inset: 0; background: rgba(7, 19, 44, 0.55); z-index: 35; }
             .main-content { margin-left: 0; width: 100%; }
             .hamb { display: block !important; }
-            .topbar { padding: 0 16px; height: 60px; }
-            .content-area { padding: 18px 14px; }
+            .topbar { padding: 0 14px; height: 60px; gap: 8px; }
+            .content-area { padding: 14px 12px; }
+        }
+        @media (max-width: 768px) {
+            html, body { overflow-x: hidden; max-width: 100%; }
+            .topbar .crumb { display: none; }
+            .topbar .pill { display: none; }
+            .content-area table { display: block; width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            .content-area [style*="grid-template-columns"] {
+                grid-template-columns: 1fr !important;
+            }
+            .content-area [style*="display:flex"][style*="justify-content:space-between"] {
+                flex-wrap: wrap !important;
+                gap: 10px !important;
+            }
         }
     </style>
 

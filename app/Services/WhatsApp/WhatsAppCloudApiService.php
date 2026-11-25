@@ -3,6 +3,7 @@
 namespace App\Services\WhatsApp;
 
 use App\Models\AiAgent;
+use App\Models\Business;
 use App\Models\Contact;
 use App\Models\Conversation;
 use App\Models\InteractiveAgentSetting;
@@ -229,6 +230,57 @@ class WhatsAppCloudApiService
         try {
             $businessId = $conversation->business_id;
             if (! $businessId) {
+                // Avoid repeating the welcome/selection prompt if AI already sent one in this conversation
+                $alreadyPrompted = Message::where('conversation_id', $conversation->id)
+                    ->where('sender_type', 'ai')
+                    ->exists();
+                if ($alreadyPrompted) {
+                    return;
+                }
+
+                $activeBusinesses = Business::where('status', 'active')->orderBy('id')->limit(3)->get(['id', 'name']);
+                if ($activeBusinesses->isEmpty()) {
+                    return;
+                }
+
+                $bodyText = 'Welcome! Please select the business you would like to connect with:';
+                $buttons = $activeBusinesses->map(fn ($b) => [
+                    'type' => 'reply',
+                    'reply' => [
+                        'id' => 'select_business_'.$b->id,
+                        'title' => Str::limit($b->name, 20, ''),
+                    ],
+                ])->values()->toArray();
+
+                $payload = [
+                    'messaging_product' => 'whatsapp',
+                    'recipient_type' => 'individual',
+                    'to' => $fromPhone,
+                    'type' => 'interactive',
+                    'interactive' => [
+                        'type' => 'button',
+                        'body' => ['text' => $bodyText],
+                        'action' => ['buttons' => $buttons],
+                    ],
+                ];
+
+                $replyMsg = Message::create([
+                    'conversation_id' => $conversation->id,
+                    'sender_type' => 'ai',
+                    'message_type' => 'interactive',
+                    'content' => $bodyText,
+                    'status' => 'queued',
+                    'raw_payload' => $payload,
+                ]);
+
+                $sendResult = $this->dispatchWhatsAppPayload($payload, $account?->id);
+                if ($sendResult['success']) {
+                    $replyMsg->update([
+                        'message_id' => $sendResult['message_id'] ?? null,
+                        'status' => 'sent',
+                    ]);
+                }
+
                 return;
             }
 
